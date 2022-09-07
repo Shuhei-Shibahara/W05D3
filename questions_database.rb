@@ -33,6 +33,25 @@ class Users
         return nil unless user.length > 0
         Users.new(user.first)
     end
+
+    def self.find_by_name(fname, lname)
+        user =
+        QuestionsDatabase.instance.execute(<<-SQL, fname, lname)
+        SELECT
+            *
+        FROM  
+            users
+        WHERE
+            fname = ? AND 
+            lname = ?
+        SQL
+        return nil unless user.length > 0
+        Users.new(user.first)
+    end
+
+    def authored_questions
+
+    end
 end
 
 
@@ -58,6 +77,23 @@ class Questions
         SQL
         return nil unless question.length > 0
         Questions.new(question.first)
+    end
+
+    def self.find_by_author_id(author_id)
+        author = 
+        QuestionsDatabase.instance.execute(<<-SQL, author_id)
+        SELECT
+            *
+        FROM  
+            questions
+        WHERE
+            author_id = ?
+        SQL
+        return nil unless question.length > 0
+        author.each do |question|
+            Questions.new(question)
+        end
+    
     end
 end
 
