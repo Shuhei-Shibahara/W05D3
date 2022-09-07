@@ -5,7 +5,7 @@ CREATE TABLE users (
 
     id INTEGER PRIMARY KEY,
     fname TEXT,
-    lname TEXT,
+    lname TEXT
 );
 
 DROP TABLE IF EXISTS questions;
@@ -14,6 +14,7 @@ DROP TABLE IF EXISTS questions;
     id INTEGER PRIMARY KEY,
     title TEXT,
     body TEXT,
+    user_id INTEGER NOT NULL,
 
     FOREIGN KEY (user_id) REFERENCES users(id)
  );
@@ -23,7 +24,7 @@ DROP TABLE IF EXISTS questions;
     
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (question_id) REFERENCES questions(id),
- )
+ );
 
  DROP TABLE IF EXISTS replies
  CREATE TABLE replies (
@@ -31,14 +32,47 @@ DROP TABLE IF EXISTS questions;
    id INTEGER PRIMARY KEY,
    FOREIGN KEY (question_id) REFERENCES questions(id),
    FOREIGN KEY (parent_reply) REFERENCES reply(id),
-   FOREIGN KEY (author) REFERENCES users(id)
-   FOREIGN KEY (body) REFERENCES questions(body)
- )
+   FOREIGN KEY (author) REFERENCES users(id),
+   body TEXT,
+ );
  
  DROP TABLE IF EXISTS question_likes
  CREATE TABLE question_likes (
 
    FOREIGN KEY (question) REFERENCES questions(id),
-   FOREIGN KEY (user) REFERENCES users(id)
+   FOREIGN KEY (user) REFERENCES users(id),
 
- )
+ );
+
+INSERT INTO 
+    users(fname,lname)
+VALUES
+    ('Shu', 'Shibahara'),
+    ('Mike', 'Moses');
+
+INSERT INTO  
+    questions(title, body)
+VALUES
+    ('Where''s my hat?', 'Yesterday I was drunk and I lost my hat'),
+    ('Who''s the best teacher?', 'Trying to find a tutor for coding.');
+
+INSERT INTO    
+    question_follows(user_id, question_id)
+VALUES
+    (1,2)
+    (1,1);
+
+INSERT INTO 
+    replies(question_id, parent_reply, author, body)
+VALUES
+    (1, NULL, 1, 'I should learn to drink less.')
+    (1, 1, 2, 'You learned your lesson punk!')
+
+INSERT INTO
+    question_likes(question,user)
+VALUES
+    (2,2)
+    (1,2)
+
+
+
