@@ -50,7 +50,7 @@ class Users
     end
 
     def authored_questions
-
+        Questions.find_by_author_id(self.id)
     end
 end
 
@@ -79,18 +79,18 @@ class Questions
         Questions.new(question.first)
     end
 
-    def self.find_by_author_id(author_id)
+    def self.find_by_author_id(user_id)
         author = 
-        QuestionsDatabase.instance.execute(<<-SQL, author_id)
+        QuestionsDatabase.instance.execute(<<-SQL, user_id)
         SELECT
             *
         FROM  
             questions
         WHERE
-            author_id = ?
+            user_id = ?
         SQL
-        return nil unless question.length > 0
-        author.each do |question|
+        return nil unless author.length > 0
+        author.map do |question|
             Questions.new(question)
         end
     
@@ -122,4 +122,25 @@ class Replies
         return nil unless reply.length > 0
         Replies.new(reply.first)
     end
+
+    def parent_reply
+        parent_reply = 
+        QuestionsDatabase.instance.execute(<<-SQL, self.question_id)
+        SELECT
+            *
+        FROM  
+            replies
+        WHERE
+            question_id = ?
+        ORDER BY
+            id DESC
+        LIMIT
+            1
+        OFFSET
+            1
+        SQL
+        return nil unless parent_reply.length > 0
+        Replies.new(parent_reply.first)
+    end
+
 end
