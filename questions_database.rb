@@ -54,7 +54,7 @@ class Users
     end
 
     def followed_questions
-
+        QuestionFollows.followers_for_user_id(self.id)
     end
 end
 
@@ -101,7 +101,7 @@ class Questions
     end
 end
 
-class QuestionFollow
+class QuestionFollows
     attr_accessor :user_id, :question_id
 
     def initialize(options)
@@ -123,7 +123,7 @@ class QuestionFollow
         SQL
 
         users.map do |user|
-            QuestionFollow.new(user)
+            QuestionFollows.new(user)
         end
     end
 
@@ -131,7 +131,7 @@ class QuestionFollow
         users = 
         QuestionsDatabase.instance.execute(<<-SQL, user_id)
         SELECT 
-            fname, lname
+            fname, lname, id
         FROM 
             question_follows
         JOIN
@@ -141,7 +141,26 @@ class QuestionFollow
         SQL
 
         users.map do |user|
-            QuestionFollow.new(user)
+            Users.new(user)
+        end
+    end
+
+    def self.most_followed_question(n = 1)
+        questions = 
+        QuestionsDatabase.instance.execute(<<-SQL, n)
+        SELECT
+            question_id, user_id, COUNT(*) AS follows
+        FROM
+            question_follows
+        GROUP BY
+            question_id
+        ORDER BY
+            COUNT(*)
+        LIMIT
+            ?
+        SQL
+        questions.map do |question|
+            QuestionFollows.new(question)
         end
     end
 end 
