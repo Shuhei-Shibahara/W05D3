@@ -52,6 +52,10 @@ class Users
     def authored_questions
         Questions.find_by_author_id(self.id)
     end
+
+    def followed_questions
+
+    end
 end
 
 
@@ -97,6 +101,50 @@ class Questions
     end
 end
 
+class QuestionFollow
+    attr_accessor :user_id, :question_id
+
+    def initialize(options)
+        @user_id = options['user_id']
+        @question_id = options['question_id']
+    end
+
+    def self.followers_for_questions_id(question_id)
+        user = 
+        QuestionsDatabase.instance.execute(<<-SQL, question_id)
+        SELECT 
+            fname, lname
+        FROM 
+            question_follows
+        JOIN
+            users ON users.id = question_follows.user_id
+        WHERE
+            question_id = ?
+        SQL
+
+        users.map do |user|
+            QuestionFollow.new(user)
+        end
+    end
+
+    def self.followers_for_user_id(user_id)
+        users = 
+        QuestionsDatabase.instance.execute(<<-SQL, user_id)
+        SELECT 
+            fname, lname
+        FROM 
+            question_follows
+        JOIN
+            users ON users.id = question_follows.user_id
+        WHERE
+            user_id = ?
+        SQL
+
+        users.map do |user|
+            QuestionFollow.new(user)
+        end
+    end
+end 
 
 class Replies
     attr_accessor :id, :question_id, :parent_reply, :author, :body
